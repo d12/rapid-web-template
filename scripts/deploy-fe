@@ -1,13 +1,12 @@
 #!/usr/bin/env ruby
 
 require "aws-sdk-s3"
+require "parallel"
+require "ruby-progressbar"
 require "dotenv/load"
 require "json"
-require "byebug"
 
 REQUIRED_CONFIG_KEYS = ["project_name", "r2_bucket_name", "cloudflare_domain"]
-
-skip_builds = ARGV.include?("--skip-build")
 
 @r2 = Aws::S3::Client.new(
   access_key_id: ENV["CLOUDFLARE_ACCESS_KEY_ID"],
@@ -23,6 +22,7 @@ REQUIRED_CONFIG_KEYS.each do |key|
   end
 end
 
+skip_builds = ARGV.include?("--skip-builds")
 if skip_builds
   puts "Skipping frontend build."
 else
@@ -35,15 +35,20 @@ else
     end
   end
 
-  puts "Done."
+  puts "Done.\n"
 end
 
 files_to_deploy = Dir[File.join(File.dirname(__FILE__), "../frontend/build/**/*")].reject do |file|
   File.directory?(file)
 end
 
-puts "\nDeploying #{files_to_deploy.length} files to Cloudflare R2..."
-files_to_deploy.each do |file|
+
+options = {
+  in_processes: 8,
+  progress: "Uploading static assets to R2..."
+}
+
+Parallel.each(files_to_deploy, options) do |file|
   # Grab the file name without the build directory.
   # Capture everything after frontend/build/
   file_name = file.match(/frontend\/build\/(.*)/)[1]
