@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+require "aws-sdk-s3"
+require "dotenv/load"
+require "json"
+require "byebug"
+
+REQUIRED_CONFIG_KEYS = ["project_name", "r2_bucket_name", "cloudflare_domain"]
+
+skip_builds = ARGV.include?("--skip-build")
+
+@r2 = Aws::S3::Client.new(
+  access_key_id: ENV["CLOUDFLARE_ACCESS_KEY_ID"],
+  secret_access_key: ENV["CLOUDFLARE_SECRET_ACCESS_KEY"],
+  endpoint: "https://#{ENV["CLOUDFLARE_ACCOUNT_ID"]}.r2.cloudflarestorage.com",
+  region: "auto",
+)
+
+config = JSON.parse(File.read(File.join(File.dirname(__FILE__), "../config.json")))
+REQUIRED_CONFIG_KEYS.each do |key|
+  unless config[key] && !config[key].empty?
+    raise "Missing required config key: #{key}"
+  end
+end
+
+if skip_builds
+  puts "Skipping frontend build."
+else
+  puts "Building frontend..."
+  Dir.chdir(File.join(File.dirname(__FILE__), "../frontend")) do
+    `npm run build`
+
+    unless $?.success?
+      raise "Failed to build frontend"
+    end
+  end
+
+  puts "Done."
+end
+
+files_to_deploy = Dir[File.join(File.dirname(__FILE__), "../frontend/build/**/*")].reject do |file|
+  File.directory?(file)
+end
+
+puts "\nDeploying #{files_to_deploy.length} files to Cloudflare R2..."
+files_to_deploy.each do |file|
+  # Grab the file name without the build directory.
+  # Capture everything after frontend/build/
+  file_name = file.match(/frontend\/build\/(.*)/)[1]
+
+  # Put the index.html in the root of the bucket so that you don't need index.html in the URL
+  key = file_name == "index.html" ? config["project_name"] : "#{config["project_name"]}/#{file_name}"
+
+  @r2.put_object(
+    bucket: config["r2_bucket_name"],
+    key: key,
+    body: File.read(file),
+  )
+end
+
+puts "Done."

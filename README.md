@@ -23,3 +23,5 @@ I'm also using MUI as a frontend framework because it's what I know well and it'
 - [ ] Scripts to spin up a new project from the template
 - [ ] Deployment scripts
 - [ ] Guides for others who want to use this project
+- [ ] Support rollbacks, warnings on overwrite, and other safeguards
+- [ ] Clean up old JS bundles from bucket without downtime

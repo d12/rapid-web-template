@@ -1,0 +1,5 @@
+{
+    "project_name": "template_test",
+    "r2_bucket_name": "natw-dev",
+    "cloudflare_domain": "dev.natw.io"
+}
