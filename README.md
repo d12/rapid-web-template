@@ -1,10 +1,18 @@
 # Cloudflare template
 
-The beginnings of a new project template for spinning up projects quickly. Goals:
+A project template for spinning up web projects quickly.
 
-- Rapid deployment in <30 seconds
-- $0 cost for new demos
-- No manual devops work, projects can be bootstrapped on the commnd line.
+## Current state
+
+This template is missing a lot of core web-app features. I'll add more as I develop more projects with it.
+
+## Idealogy
+
+- New ideas should be developed and validated rapidly
+- Developing a fixed and simple foundation will allow me to spend less time on scaffolding
+- Difficult-to-reverse commitments should be avoided when prototyping. E.g. domain naming.
+- Demos should cost me $0 or close to it.
+- Time-to-demo of <1 week should be possible with a solid foundation and template
 
 ## Stack
 
