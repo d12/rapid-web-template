@@ -63,4 +63,4 @@ Parallel.each(files_to_deploy, options) do |file|
   )
 end
 
-puts "Done."
+puts "\n Deployed! You can visit https://#{config["cloudflare_domain"]}/#{config["project_name"]} to see your new project."

@@ -74,8 +74,6 @@ if deploy == "Y" || deploy == "y" || deploy == ""
   Dir.chdir(new_project_dir) do
     system("./scripts/deploy-fe")
   end
-
-  puts "\n Deployed! You can visit https://#{config_json_contents["cloudflare_domain"]}/#{project_name} to see your new project."
 end
 
 puts "\nDone!"
