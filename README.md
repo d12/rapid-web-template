@@ -17,11 +17,69 @@ I'll be using Cloudflare as the primary provider for this template as it solves 
 
 I'm also using MUI as a frontend framework because it's what I know well and it'll let me iterate rapidly.
 
+## Copying the template
+
+```
+./scripts/copy-template
+Project name: demo2
+
+Copying template to /Users/d12/dev/cloudflare-template/demo2...
+
+Copying files...
+
+Copying Gemfile/Gemfile.lock...
+
+Setting project name in package.json...
+
+Setting project name in config.json...
+
+Setting permission bits on scripts...
+
+Running bundle install...
+Using aws-eventstream 1.2.0
+Using aws-partitions 1.767.0
+Using aws-sigv4 1.5.2
+Using jmespath 1.6.2
+Using aws-sdk-core 3.173.0
+Using aws-sdk-kms 1.64.0
+Using aws-sdk-s3 1.122.0
+Using bundler 2.4.9
+Using parallel 1.23.0
+Using ruby-progressbar 1.13.0
+Bundle complete! 3 Gemfile dependencies, 10 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
+
+Done!
+
+Do you want to deploy? (Y/n)
+y
+
+Deploying...
+Building frontend...
+Done.
+Uploading static assets to R2... |Time: 00:00:00 | ======================================================================================================= | Time: 00:00:00
+Done.
+
+ Deployed! You can visit https://dev.natw.io/demo2 to see your new project.
+
+Done!
+```
+
+## Deploying the frontend
+
+```
+./scripts/deploy-fe
+
+Deploying...
+Building frontend...
+Done.
+Uploading static assets to R2... |Time: 00:00:00 | ======================================================================================================= | Time: 00:00:00
+Done.
+```
+
 ## Work to be done:
 
 - [ ] Cloudflare Workers in template
-- [ ] Scripts to spin up a new project from the template
-- [ ] Deployment scripts
 - [ ] Guides for others who want to use this project
 - [ ] Support rollbacks, warnings on overwrite, and other safeguards
 - [ ] Clean up old JS bundles from bucket without downtime
