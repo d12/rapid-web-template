@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+require "json"
+require "byebug"
+
+working_dir = Dir.pwd
+current_dir = File.dirname(__FILE__)
+
+print "Project name: "
+project_name = gets.chomp
+
+new_project_dir = File.expand_path(File.join(working_dir, project_name))
+
+puts "\nCopying template to #{new_project_dir}..."
+
+# Check if new_project_dir exists
+if Dir.exist?(new_project_dir)
+  puts "ERROR: A directory already exists at #{new_project_dir}."
+  exit 1
+end
+
+# Make directory
+Dir.mkdir(new_project_dir)
+
+# Copy all files from template to new_project_dir
+# But exclude node_modules and build/
+puts "\nCopying files..."
+FileUtils.copy_entry(File.join(current_dir, "../template"), new_project_dir)
+
+# Copy Gemfile/Gemfile.lock
+puts "\nCopying Gemfile/Gemfile.lock..."
+FileUtils.cp(File.join(current_dir, "../Gemfile"), File.join(new_project_dir, "Gemfile"))
+FileUtils.cp(File.join(current_dir, "../Gemfile.lock"), File.join(new_project_dir, "Gemfile.lock"))
+
+# Set the project name as homepage in package.json
+puts "\nSetting project name in package.json..."
+package_json = File.join(new_project_dir, "frontend/package.json")
+package_json_contents = JSON.parse(File.read(package_json))
+package_json_contents["homepage"] = "/#{project_name}"
+File.write(package_json, JSON.pretty_generate(package_json_contents))
+
+puts "\nSetting project name in config.json..."
+config_json = File.join(new_project_dir, "config.json")
+config_json_contents = JSON.parse(File.read(config_json))
+config_json_contents["project_name"] = project_name
+File.write(config_json, JSON.pretty_generate(config_json_contents))
+
+puts "\nSetting permission bits on scripts..."
+Dir.glob(File.join(new_project_dir, "scripts", "*")) do |file|
+  File.chmod(0755, file)
+end
+
+puts "\nRunning bundle install..."
+Dir.chdir(new_project_dir) do
+  system("bundle install")
+end
+
+# puts "\nRunning npm install..."
+# Dir.chdir(File.join(new_project_dir, "frontend")) do
+#   system("npm install")
+# end
+
+File.write(package_json, JSON.pretty_generate(package_json_contents))
+
+puts "\nDone!"
+
+puts "\nDo you want to deploy? (Y/n)"
+deploy = gets.chomp
+
+if deploy == "Y" || deploy == "y" || deploy == ""
+  puts "\nDeploying..."
+
+  Dir.chdir(new_project_dir) do
+    system("./scripts/deploy-fe")
+  end
+
+  puts "\n Deployed! You can visit https://#{config_json_contents["cloudflare_domain"]}/#{project_name} to see your new project."
+end
+
+puts "\nDone!"

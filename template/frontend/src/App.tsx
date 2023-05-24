@@ -22,7 +22,7 @@ export default function App() {
     <Container maxWidth="sm">
       <Box sx={{ my: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          AHH BEES!
+          Welcome to your new project!
         </Typography>
         <ProTip />
         <Copyright />
